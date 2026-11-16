@@ -3,6 +3,7 @@ import 'package:material_ui/material_ui.dart';
 import 'models/cat_feed_item.dart';
 import 'services/cat_api_service.dart';
 import 'pages/checkbox_facts_page.dart';
+import 'pages/custom_button_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -24,6 +25,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => const MyHomePage(),
         '/second': (context) => const SecondPage(),
         '/checkboxes': (context) => const CheckBoxFactsPage(),
+        '/custom-button': (context) => const CustomButtonPage(),
       },
     );
   }
@@ -35,7 +37,7 @@ class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Головна сторінка')),
+      appBar: AppBar(title: const Text('Home Page')),
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -48,6 +50,11 @@ class MyHomePage extends StatelessWidget {
             ElevatedButton(
               onPressed: () => Navigator.pushNamed(context, '/checkboxes'),
               child: const Text('Checkboxes'),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () => Navigator.pushNamed(context, '/custom-button'),
+              child: const Text('Custom Button'),
             ),
           ],
         ),
