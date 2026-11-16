@@ -1,5 +1,8 @@
 import 'package:material_ui/material_ui.dart';
 
+import 'models/cat_feed_item.dart';
+import 'services/cat_api_service.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -10,6 +13,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      title: 'Flutter',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.orange),
+        useMaterial3: true,
+      ),
       initialRoute: '/',
       routes: {
         '/': (context) => const MyHomePage(),
@@ -25,12 +33,10 @@ class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('My Home Page')),
+      appBar: AppBar(title: const Text('Головна сторінка')),
       body: Center(
         child: ElevatedButton(
-          onPressed: () {
-            Navigator.pushNamed(context, '/second');
-          },
+          onPressed: () => Navigator.pushNamed(context, '/second'),
           child: const Text('Next'),
         ),
       ),
@@ -38,20 +44,74 @@ class MyHomePage extends StatelessWidget {
   }
 }
 
-class SecondPage extends StatelessWidget {
+class SecondPage extends StatefulWidget {
   const SecondPage({super.key});
+
+  @override
+  State<SecondPage> createState() => _SecondPageState();
+}
+
+class _SecondPageState extends State<SecondPage> {
+  final CatApiService _apiService = CatApiService();
+  late Future<List<CatFeedItem>> _feedFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _feedFuture = _apiService.fetchMixedFeed(count: 5);
+  }
+
+  void _reloadFeed() {
+    setState(() {
+      _feedFuture = _apiService.fetchMixedFeed(count: 5);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Second Page')),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          child: const Text('Back'),
-        ),
+      appBar: AppBar(title: const Text('Cat Feed')),
+      body: FutureBuilder<List<CatFeedItem>>(
+        future: _feedFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('Помилка: ${snapshot.error}'),
+                  const SizedBox(height: 12),
+                  ElevatedButton(
+                    onPressed: _reloadFeed,
+                    child: const Text('Спробувати знову'),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          final items = snapshot.data ?? [];
+          return Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 600),
+              child: ListView.builder(
+                padding: const EdgeInsets.only(bottom: 80),
+                itemCount: items.length,
+                itemBuilder: (context, index) {
+                  return items[index].buildWidget(context);
+                },
+              ),
+            ),
+          );
+        },
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => Navigator.pop(context),
+        icon: const Icon(Icons.arrow_back),
+        label: const Text('Back'),
       ),
     );
   }
