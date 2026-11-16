@@ -2,6 +2,7 @@ import 'package:material_ui/material_ui.dart';
 
 import 'models/cat_feed_item.dart';
 import 'services/cat_api_service.dart';
+import 'pages/checkbox_facts_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -22,6 +23,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => const MyHomePage(),
         '/second': (context) => const SecondPage(),
+        '/checkboxes': (context) => const CheckBoxFactsPage(),
       },
     );
   }
@@ -35,9 +37,19 @@ class MyHomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Головна сторінка')),
       body: Center(
-        child: ElevatedButton(
-          onPressed: () => Navigator.pushNamed(context, '/second'),
-          child: const Text('Next'),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ElevatedButton(
+              onPressed: () => Navigator.pushNamed(context, '/second'),
+              child: const Text('Cat Feed'),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () => Navigator.pushNamed(context, '/checkboxes'),
+              child: const Text('Checkboxes'),
+            ),
+          ],
         ),
       ),
     );

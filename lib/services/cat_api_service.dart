@@ -53,4 +53,20 @@ class CatApiService {
 
     return mixedList;
   }
+
+  Future<List<CatFactModel>> fetchFactsOnly({int count = 6}) async {
+    final response = await http.get(
+      Uri.parse('https://meowfacts.herokuapp.com/?count=$count&lang=ukr'),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Помилка завантаження фактів');
+    }
+
+    final factsJson = jsonDecode(response.body) as Map<String, dynamic>;
+    final List<dynamic> rawFacts = factsJson['data'] ?? [];
+    return rawFacts
+        .map((item) => CatFactModel.fromString(item.toString()))
+        .toList();
+  }
 }
